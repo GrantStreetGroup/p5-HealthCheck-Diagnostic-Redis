@@ -79,7 +79,14 @@ sub run {
         };
     }
 
-    my $key = $redis->randomkey();
+    my ($key, $error) = $redis->randomkey();
+    return {
+        status  => 'CRITICAL',
+        info    => "Error for $description: Getting Random entry failed - $error",
+    } if ($error);
+
+    # At this point, the only way this fails is if there are no entries in the
+    # Redis DB.
     if ($key) {
         my $val = $redis->get($key);
         return {
