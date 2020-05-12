@@ -1,11 +1,18 @@
-use GSG::Gitc::CPANfile $_environment;
+requires 'strict';
+requires 'warnings';
+requires 'parent';
 
-# Add your requirements here
+requires 'Carp';
+
 requires 'HealthCheck::Diagnostic';
 requires 'Redis::Fast';
 
-test_requires 'Test::MockModule';
+on test => sub {
+    requires 'Data::Dumper';
+    requires 'Test::MockModule';
+    requires 'Test::More';
+};
 
 on develop => sub {
-    requires 'Dist::Zilla::PluginBundle::Author::GSG::Internal';
+    requires 'Dist::Zilla::PluginBundle::Author::GSG';
 };

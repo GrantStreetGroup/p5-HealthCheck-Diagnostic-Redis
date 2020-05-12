@@ -110,7 +110,7 @@ __END__
 
     # Just check that we can connect to a host, and get a random value back.
     HealthCheck::Diagnostic::Redis->check(
-        host => 'test3-app-redisha-m',
+        host => 'redis.example.com',
     );
 
 =head1 DESCRIPTION
