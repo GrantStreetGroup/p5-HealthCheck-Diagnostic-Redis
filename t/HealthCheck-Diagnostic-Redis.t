@@ -3,7 +3,6 @@ use warnings;
 
 use Test::More;
 use Test::MockModule;
-use Data::Dumper;
 
 BEGIN { use_ok('HealthCheck::Diagnostic::Redis') };
 
