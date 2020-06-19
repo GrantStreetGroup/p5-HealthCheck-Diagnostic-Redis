@@ -9,7 +9,7 @@ BEGIN { use_ok('HealthCheck::Diagnostic::Redis') };
 diag(qq(HealthCheck::Diagnostic::Redis Perl $], $^X));
 
 my %fake_redis_store = (
-    random_key => 1234,
+    recent_key => 1234,
 );
 
 # Mock the Redis module so that we can pretend to have good and bad hosts.
@@ -36,7 +36,7 @@ $mock->mock( ping => sub {
 } );
 $mock->mock( randomkey => sub {
     my $self = shift;
-    return 'random_key';
+    return 'recent_key';
 } );
 # We have to mock out destroy, or things break terribly because of Redis::Fast
 # AUTOLOAD...
