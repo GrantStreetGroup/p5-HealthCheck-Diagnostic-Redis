@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More;
 use Test::MockModule;
+use Test::Differences;
 
 BEGIN { use_ok('HealthCheck::Diagnostic::Redis') };
 
@@ -95,5 +96,10 @@ $mock->mock( DESTROY => sub {} );
     ok $@, "Check with no host dies.";
     like $@, qr/^No host/, "Error is No Host.";
 }
+
+# Make sure that the redis keys were deleted.
+eq_or_diff( \%fake_redis_store, {
+    recent_key => 1234,
+}, 'Fake redis store is emptied back to default.' );
 
 done_testing;
