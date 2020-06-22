@@ -7,6 +7,7 @@ use parent 'HealthCheck::Diagnostic';
 
 use Carp;
 use Redis::Fast;
+use String::Random;
 
 # ABSTRACT: Check for Redis connectivity and operations in HealthCheck
 # VERSION
@@ -79,7 +80,10 @@ sub run {
         };
     }
 
-    my $res    = $self->read_ability( $redis, $description, %params );
+    # Attempt to get a result from the readability or writeability
+    # test.
+    my $method = $params{read_only} ? 'read_ability' : 'write_ability';
+    my $res    = $self->$method( $redis, $description, %params );
 
     return $res if ref $res eq 'HASH';
     return {
@@ -108,6 +112,36 @@ sub read_ability {
     return {
         status => 'CRITICAL',
         info   => sprintf( 'Error for %s: Failed reading value of key %s',
+            $description,
+            $key,
+        ),
+    } unless defined $val;
+}
+
+sub write_ability {
+    my ($self, $redis, $description, %params) = @_;
+    my $key = $params{key_name} || sprintf(
+        '_health_check_%s',
+        String::Random->new->randregex('[A-Z0-9]{24}'),
+    );
+
+    # Do not overwrite anything in the database.
+    return {
+        status => 'CRITICAL',
+        info   => sprintf( 'Error for %s: Cannot overwrite key %s',
+            $description,
+            $key,
+        ),
+    } if defined $redis->get( $key );
+
+    # Set, get, and delete the temporary value.
+    $redis->set( $key => 'temp' );
+    my $val = $redis->get( $key );
+    $redis->del( $key );
+
+    return {
+        status => 'CRITICAL',
+        info   => sprintf( 'Error for %s: Failed writing to key %s',
             $description,
             $key,
         ),
@@ -143,6 +177,11 @@ This gets populated in the resulting C<info> tag.
 
 The server name to connect to for the test.
 This is required.
+
+=head2 read_only
+
+Run a read-only check, instead of the read-and-write check provided
+by-default.
 
 =head2 key_name
 

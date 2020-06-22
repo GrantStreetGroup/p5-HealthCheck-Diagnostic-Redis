@@ -6,6 +6,7 @@ requires 'Carp';
 
 requires 'HealthCheck::Diagnostic';
 requires 'Redis::Fast';
+requires 'String::Random';
 
 on test => sub {
     requires 'Data::Dumper';

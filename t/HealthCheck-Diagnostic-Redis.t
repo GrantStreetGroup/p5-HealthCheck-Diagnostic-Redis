@@ -32,6 +32,14 @@ $mock->mock( get => sub {
     my ($self, $key) = @_;
     return $fake_redis_store{$key};
 } );
+$mock->mock( set => sub {
+    my ($self, $key, $val) = @_;
+    $fake_redis_store{ $key } = $val;
+} );
+$mock->mock( del => sub {
+    my ($self, $key) = @_;
+    delete $fake_redis_store{ $key };
+} );
 $mock->mock( ping => sub {
     my $self = shift;
     return $self->{server} =~ /badping/ ? 0 : 1;
@@ -103,6 +111,7 @@ $mock->mock( DESTROY => sub {} );
     my $result = HealthCheck::Diagnostic::Redis->check(
         host      => 'good-host1',
         key_name  => 'reed_this_key',
+        read_only => 1,
     );
     is $result->{status}, 'CRITICAL',
         'Look for static key that does not exist.';
@@ -112,8 +121,18 @@ $mock->mock( DESTROY => sub {} );
     $result = HealthCheck::Diagnostic::Redis->check(
         host      => 'good-host1',
         key_name  => 'read_this_key',
+        read_only => 1,
     );
     is $result->{status}, 'OK', 'Look for static key that exists.';
+
+    $result = HealthCheck::Diagnostic::Redis->check(
+        host      => 'good-host1',
+        key_name  => 'read_this_key',
+    );
+    is $result->{status}, 'CRITICAL',
+        'Fail when writing to key that already exists.';
+    like $result->{info}, qr/Cannot overwrite key read_this_key/,
+        'Mention key in failure.';
 }
 
 
