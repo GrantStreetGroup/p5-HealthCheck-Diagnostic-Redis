@@ -10,7 +10,8 @@ BEGIN { use_ok('HealthCheck::Diagnostic::Redis') };
 diag(qq(HealthCheck::Diagnostic::Redis Perl $], $^X));
 
 my %fake_redis_store = (
-    recent_key => 1234,
+    recent_key    => 1234,
+    read_this_key => 'once upon a time',
 );
 
 # Mock the Redis module so that we can pretend to have good and bad hosts.
@@ -97,9 +98,29 @@ $mock->mock( DESTROY => sub {} );
     like $@, qr/^No host/, "Error is No Host.";
 }
 
+# Test that we can specify the key to read.
+{
+    my $result = HealthCheck::Diagnostic::Redis->check(
+        host      => 'good-host1',
+        key_name  => 'reed_this_key',
+    );
+    is $result->{status}, 'CRITICAL',
+        'Look for static key that does not exist.';
+    like $result->{info}, qr/Failed reading value of key reed_this_key/,
+        'Mention key in failure';
+
+    $result = HealthCheck::Diagnostic::Redis->check(
+        host      => 'good-host1',
+        key_name  => 'read_this_key',
+    );
+    is $result->{status}, 'OK', 'Look for static key that exists.';
+}
+
+
 # Make sure that the redis keys were deleted.
 eq_or_diff( \%fake_redis_store, {
-    recent_key => 1234,
+    recent_key    => 1234,
+    read_this_key => 'once upon a time',
 }, 'Fake redis store is emptied back to default.' );
 
 done_testing;

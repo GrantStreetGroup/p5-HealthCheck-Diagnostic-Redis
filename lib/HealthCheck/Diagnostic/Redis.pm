@@ -91,7 +91,7 @@ sub run {
 sub read_ability {
     my ($self, $redis, $description, %params) = @_;
 
-    my ($key, $error) = $redis->randomkey;
+    my ($key, $error) = ($params{key_name}) || $redis->randomkey;
     return {
         status => 'CRITICAL',
         info   => sprintf( 'Error for %s: Failed getting random entry - %s',
@@ -143,6 +143,10 @@ This gets populated in the resulting C<info> tag.
 
 The server name to connect to for the test.
 This is required.
+
+=head2 key_name
+
+Use a static key name instead of a randomly-generated one.
 
 =head1 DEPENDENCIES
 
