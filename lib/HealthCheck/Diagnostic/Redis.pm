@@ -79,26 +79,39 @@ sub run {
         };
     }
 
-    my ($key, $error) = $redis->randomkey();
-    return {
-        status  => 'CRITICAL',
-        info    => "Error for $description: Getting Random entry failed - $error",
-    } if ($error);
+    my $res    = $self->read_ability( $redis, $description, %params );
 
-    # At this point, the only way this fails is if there are no entries in the
-    # Redis DB.
-    if ($key) {
-        my $val = $redis->get($key);
-        return {
-            status  => 'CRITICAL',
-            info    => "Error for $description: Failed fetching value of key $key",
-        } unless defined $val;
-    }
-
+    return $res if ref $res eq 'HASH';
     return {
         status => 'OK',
         info   => "Successful connection for $description",
     };
+}
+
+sub read_ability {
+    my ($self, $redis, $description, %params) = @_;
+
+    my ($key, $error) = $redis->randomkey;
+    return {
+        status => 'CRITICAL',
+        info   => sprintf( 'Error for %s: Failed getting random entry - %s',
+            $description,
+            $error,
+        ),
+    } if $error;
+
+    # When there is no key, that means we don't have anything in the
+    # database. No need to ping on that.
+    return unless $key || $params{key_name};
+
+    my $val = $redis->get( $key );
+    return {
+        status => 'CRITICAL',
+        info   => sprintf( 'Error for %s: Failed reading value of key %s',
+            $description,
+            $key,
+        ),
+    } unless defined $val;
 }
 
 1;
