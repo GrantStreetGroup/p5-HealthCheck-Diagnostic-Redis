@@ -135,8 +135,9 @@ sub test_read_write {
         ),
     } if defined $redis->get( $key );
 
-    # Set, get, and delete the temporary value.
-    $redis->set( $key => 'temp' );
+    # Set, get, and delete the temporary value. Also set an expiration
+    # date of 5 seconds after setting just in-case.
+    $redis->setex( $key => 'temp', 5 );
     my $val = $redis->get( $key );
     $redis->del( $key );
 
