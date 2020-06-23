@@ -82,8 +82,9 @@ sub run {
 
     # Attempt to get a result from the readability or writeability
     # test.
-    my $method = $params{read_only} ? 'read_ability' : 'write_ability';
-    my $res    = $self->$method( $redis, $description, %params );
+    my $res = $params{read_only}
+        ? $self->test_read_only( $redis, $description, %params )
+        : $self->test_read_write( $redis, $description, %params );
 
     return $res if ref $res eq 'HASH';
     return {
@@ -92,7 +93,7 @@ sub run {
     };
 }
 
-sub read_ability {
+sub test_read_only {
     my ($self, $redis, $description, %params) = @_;
 
     my ($key, $error) = ($params{key_name}) || $redis->randomkey;
@@ -118,7 +119,7 @@ sub read_ability {
     } unless defined $val;
 }
 
-sub write_ability {
+sub test_read_write {
     my ($self, $redis, $description, %params) = @_;
     my $key = $params{key_name} || sprintf(
         '_health_check_%s',
