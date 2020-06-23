@@ -32,7 +32,7 @@ $mock->mock( get => sub {
     my ($self, $key) = @_;
     return $fake_redis_store{$key};
 } );
-$mock->mock( setex => sub {
+$mock->mock( set => sub {
     my ($self, $key, $val) = @_;
     $fake_redis_store{ $key } = $val;
 } );
