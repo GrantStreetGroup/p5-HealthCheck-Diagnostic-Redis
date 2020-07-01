@@ -4,7 +4,7 @@ HealthCheck::Diagnostic::Redis - Check for Redis connectivity and operations in 
 
 # VERSION
 
-version v0.0.2
+version v0.0.5
 
 # SYNOPSIS
 
@@ -32,6 +32,15 @@ This gets populated in the resulting `info` tag.
 
 The server name to connect to for the test.
 This is required.
+
+## read\_only
+
+Run a read-only check, instead of the read-and-write check provided
+by-default.
+
+## key\_name
+
+Use a static key name instead of a randomly-generated one.
 
 # DEPENDENCIES
 
