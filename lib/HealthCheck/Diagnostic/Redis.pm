@@ -59,13 +59,15 @@ sub run {
         $redis = Redis::Fast->new(
             server => $host,
 
-            # HealthCheck should not reconnect
-            reconnect => 0,
+            # Attempt to reconnect up to 5 times every 1 second. It is common to
+            # need to reconnect when in a hiredis environment in particular.
+            reconnect => 5,
+            every     => 1_000_000,
 
-            # Make this quick...
-            cnx_timeout => 0.5,
-            read_timeout => 0.5,
-            write_timeout => 0.5,
+            # 5 second connect/read/write timeouts.
+            cnx_timeout   => 5,
+            read_timeout  => 5,
+            write_timeout => 5,
         );
     };
     return {
