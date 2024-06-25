@@ -191,6 +191,16 @@ by-default.
 
 Use a static key name instead of a randomly-generated one.
 
+=head2 INTERNALS
+
+=head2 test_read_only
+
+This method is used when L</read_only> is set.
+
+=head2 test_read_write
+
+This method is used when L</read_only> is not set.
+
 =head1 DEPENDENCIES
 
 L<Redis::Fast>
