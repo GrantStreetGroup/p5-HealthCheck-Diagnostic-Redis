@@ -4,7 +4,7 @@ HealthCheck::Diagnostic::Redis - Check for Redis connectivity and operations in 
 
 # VERSION
 
-version v0.0.5
+version v0.0.6
 
 # SYNOPSIS
 
@@ -42,6 +42,16 @@ by-default.
 
 Use a static key name instead of a randomly-generated one.
 
+## INTERNALS
+
+## test\_read\_only
+
+This method is used when ["read\_only"](#read_only) is set.
+
+## test\_read\_write
+
+This method is used when ["read\_only"](#read_only) is not set.
+
 # DEPENDENCIES
 
 [Redis::Fast](https://metacpan.org/pod/Redis%3A%3AFast)
@@ -57,7 +67,7 @@ Grant Street Group <developers@grantstreet.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 - 2020 by Grant Street Group.
+This software is Copyright (c) 2019 - 2024 by Grant Street Group.
 
 This is free software, licensed under:
 
